@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #74ebd5, #acb6e5);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 900px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .title {
+            font-size: 2rem;
+            color: #2e7d32;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 600;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tabs button {
+            background: #2e7d32;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .tabs button:hover, .tabs button.active {
+            background: #1b5e20;
+            transform: scale(1.05);
+        }
+
+        .converter {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .converter-section {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 20px;
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .converter-section:hover {
+            transform: translateY(-5px);
+        }
+
+        .converter-section label {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .converter-section input, .converter-section select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            outline: none;
+            background: #f5f5f5;
+        }
+
+        .converter-section select {
+            appearance: none;
+            background: #f5f5f5 url('data:image/svg+xml;utf8,<svg fill="gray" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 10px center;
+        }
+
+        /* Simple Calculator Styles */
+        .calculator-section {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 15px;
+            margin: 0 auto;
+            max-width: 400px;
+        }
+
+        .calculator-section input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            text-align: right;
+        }
+
+        .calculator-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            width: 100%;
+        }
+
+        .calculator-buttons button {
+            padding: 15px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 10px;
+            background: #2e7d32;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .calculator-buttons button:hover {
+            background: #1b5e20;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .converter {
+                flex-direction: column;
+            }
+
+            .converter-section {
+                min-width: 100%;
+            }
+
+            .tabs button {
+                padding: 8px 15px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Unit Converter</h1>
+
+        <!-- Tabs for Categories -->
+        <div class="tabs">
+            <button class="tab active" onclick="setCategory('length')">Length</button>
+            <button class="tab" onclick="setCategory('temperature')">Temperature</button>
+            <button class="tab" onclick="setCategory('area')">Area</button>
+            <button class="tab" onclick="setCategory('volume')">Volume</button>
+            <button class="tab" onclick="setCategory('weight')">Weight</button>
+            <button class="tab" onclick="setCategory('time')">Time</button>
+            <button class="tab" onclick="setCategory('engineering')">Engineering</button>
+            <button class="tab" onclick="setCategory('heat')">Heat</button>
+            <button class="tab" onclick="setCategory('fluids')">Fluids</button>
+            <button class="tab" onclick="setCategory('light')">Light</button>
+            <button class="tab" onclick="setCategory('electricity')">Electricity</button>
+            <button class="tab" onclick="setCategory('magnetism')">Magnetism</button>
+            <button class="tab" onclick="setCategory('radiology')">Radiology</button>
+            <button class="tab" onclick="setCategory('calculator')">Simple Calculator</button>
+        </div>
+
+        <!-- Converter Section -->
+        <div class="converter" id="converterSection">
+            <div class="converter-section">
+                <label>From:</label>
+                <input type="number" id="inputValue" placeholder="Enter value" oninput="convert()">
+                <select id="fromUnit" onchange="convert()"></select>
+            </div>
+            <div class="converter-section">
+                <label>To:</label>
+                <input type="number" id="outputValue" placeholder="Result" readonly>
+                <select id="toUnit" onchange="convert()"></select>
+            </div>
+        </div>
+
+        <!-- Simple Calculator Section -->
+        <div class="calculator-section" id="calculatorSection">
+            <input type="text" id="calcDisplay" readonly>
+            <div class="calculator-buttons">
+                <button onclick="clearDisplay()">C</button>
+                <button onclick="appendToDisplay('(')">(</button>
+                <button onclick="appendToDisplay(')')">)</button>
+                <button onclick="appendToDisplay('/')">/</button>
+                <button onclick="appendToDisplay('7')">7</button>
+                <button onclick="appendToDisplay('8')">8</button>
+                <button onclick="appendToDisplay('9')">9</button>
+                <button onclick="appendToDisplay('*')">*</button>
+                <button onclick="appendToDisplay('4')">4</button>
+                <button onclick="appendToDisplay('5')">5</button>
+                <button onclick="appendToDisplay('6')">6</button>
+                <button onclick="appendToDisplay('-')">-</button>
+                <button onclick="appendToDisplay('1')">1</button>
+                <button onclick="appendToDisplay('2')">2</button>
+                <button onclick="appendToDisplay('3')">3</button>
+                <button onclick="appendToDisplay('+')">+</button>
+                <button onclick="appendToDisplay('0')">0</button>
+                <button onclick="appendToDisplay('.')">.</button>
+                <button onclick="calculate()">=</button>
+                <button onclick="backspace()">⌫</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Unit definitions for each category
+        const units = {
+            length: [
+                { name: "Meter", value: "meter" },
+                { name: "Kilometer", value: "kilometer" },
+                { name: "Centimeter", value: "centimeter" },
+                { name: "Millimeter", value: "millimeter" },
+                { name: "Micrometer", value: "micrometer" },
+                { name: "Nanometer", value: "nanometer" },
+                { name: "Mile", value: "mile" },
+                { name: "Yard", value: "yard" },
+                { name: "Foot", value: "foot" },
+                { name: "Inch", value: "inch" },
+                { name: "Light Year", value: "lightyear" }
+            ],
+            temperature: [
+                { name: "Celsius", value: "celsius" },
+                { name: "Fahrenheit", value: "fahrenheit" },
+                { name: "Kelvin", value: "kelvin" }
+            ],
+            area: [
+                { name: "Square Meter", value: "squaremeter" },
+                { name: "Square Kilometer", value: "squarekilometer" },
+                { name: "Square Mile", value: "squaremile" },
+                { name: "Square Yard", value: "squareyard" },
+                { name: "Square Foot", value: "squarefoot" },
+                { name: "Square Inch", value: "squareinch" },
+                { name: "Hectare", value: "hectare" },
+                { name: "Acre", value: "acre" }
+            ],
+            volume: [
+                { name: "Cubic Meter", value: "cubicmeter" },
+                { name: "Cubic Kilometer", value: "cubickilometer" },
+                { name: "Cubic Centimeter", value: "cubiccentimeter" },
+                { name: "Liter", value: "liter" },
+                { name: "Milliliter", value: "milliliter" },
+                { name: "Gallon", value: "gallon" },
+                { name: "Cubic Inch", value: "cubicinch" },
+                { name: "Cubic Foot", value: "cubicfoot" }
+            ],
+            weight: [
+                { name: "Kilogram", value: "kilogram" },
+                { name: "Gram", value: "gram" },
+                { name: "Milligram", value: "milligram" },
+                { name: "Metric Ton", value: "metricton" },
+                { name: "Pound", value: "pound" },
+                { name: "Ounce", value: "ounce" }
+            ],
+            time: [
+                { name: "Second", value: "second" },
+                { name: "Millisecond", value: "millisecond" },
+                { name: "Microsecond", value: "microsecond" },
+                { name: "Nanosecond", value: "nanosecond" },
+                { name: "Picosecond", value: "picosecond" },
+                { name: "Minute", value: "minute" },
+                { name: "Hour", value: "hour" },
+                { name: "Day", value: "day" },
+                { name: "Week", value: "week" },
+                { name: "Month", value: "month" },
+                { name: "Year", value: "year" }
+            ],
+            engineering: [
+                { name: "Newton", value: "newton" },
+                { name: "Kilonewton", value: "kilonewton" },
+                { name: "Pound-force", value: "poundforce" }
+            ],
+            heat: [
+                { name: "Joule", value: "joule" },
+                { name: "Kilojoule", value: "kilojoule" },
+                { name: "Calorie", value: "calorie" },
+                { name: "Kilocalorie", value: "kilocalorie" }
+            ],
+            fluids: [
+                { name: "Pascal", value: "pascal" },
+                { name: "Bar", value: "bar" },
+                { name: "Atmosphere", value: "atmosphere" }
+            ],
+            light: [
+                { name: "Lux", value: "lux" },
+                { name: "Foot-candle", value: "footcandle" }
+            ],
+            electricity: [
+                { name: "Volt", value: "volt" },
+                { name: "Millivolt", value: "millivolt" },
+                { name: "Kilovolt", value: "kilovolt" }
+            ],
+            magnetism: [
+                { name: "Tesla", value: "tesla" },
+                { name: "Gauss", value: "gauss" }
+            ],
+            radiology: [
+                { name: "Gray", value: "gray" },
+                { name: "Sievert", value: "sievert" }
+            ]
+        };
+
+        // Conversion rates (relative to base unit)
+        const conversionRates = {
+            length: {
+                meter: 1,
+                kilometer: 0.001,
+                centimeter: 100,
+                millimeter: 1000,
+                micrometer: 1e6,
+                nanometer: 1e9,
+                mile: 0.000621371,
+                yard: 1.09361,
+                foot: 3.28084,
+                inch: 39.3701,
+                lightyear: 1.057e-16
+            },
+            area: {
+                squaremeter: 1,
+                squarekilometer: 0.000001,
+                squaremile: 0.0000003861,
+                squareyard: 1.19599,
+                squarefoot: 10.7639,
+                squareinch: 1550,
+                hectare: 0.0001,
+                acre: 0.000247105
+            },
+            volume: {
+                cubicmeter: 1,
+                cubickilometer: 0.000000001,
+                cubiccentimeter: 1e6,
+                liter: 1000,
+                milliliter: 1e6,
+                gallon: 264.172,
+                cubicinch: 61023.7,
+                cubicfoot: 35.3147
+            },
+            weight: {
+                kilogram: 1,
+                gram: 1000,
+                milligram: 1e6,
+                metricton: 0.001,
+                pound: 2.20462,
+                ounce: 35.274
+            },
+            time: {
+                second: 1,
+                millisecond: 1000,
+                microsecond: 1e6,
+                nanosecond: 1e9,
+                picosecond: 1e12,
+                minute: 1 / 60,
+                hour: 1 / 3600,
+                day: 1 / 86400,
+                week: 1 / 604800,
+                month: 1 / 2.628e6,
+                year: 1 / 3.156e7
+            },
+            engineering: {
+                newton: 1,
+                kilonewton: 0.001,
+                poundforce: 0.224809
+            },
+            heat: {
+                joule: 1,
+                kilojoule: 0.001,
+                calorie: 0.239,
+                kilocalorie: 0.000239
+            },
+            fluids: {
+                pascal: 1,
+                bar: 0.00001,
+                atmosphere: 0.000009869
+            },
+            light: {
+                lux: 1,
+                footcandle: 0.092903
+            },
+            electricity: {
+                volt: 1,
+                millivolt: 1000,
+                kilovolt: 0.001
+            },
+            magnetism: {
+                tesla: 1,
+                gauss: 10000
+            },
+            radiology: {
+                gray: 1,
+                sievert: 1
+            }
+        };
+
+        // Temperature conversion (special case)
+        function convertTemperature(value, fromUnit, toUnit) {
+            let celsius;
+            if (fromUnit === "celsius") celsius = value;
+            else if (fromUnit === "fahrenheit") celsius = (value - 32) * 5 / 9;
+            else if (fromUnit === "kelvin") celsius = value - 273.15;
+
+            if (toUnit === "celsius") return celsius;
+            else if (toUnit === "fahrenheit") return (celsius * 9 / 5) + 32;
+            else if (toUnit === "kelvin") return celsius + 273.15;
+        }
+
+        // Tab functionality
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+
+        // Populate units based on category
+        function populateUnits(category) {
+            const fromUnit = document.getElementById('fromUnit');
+            const toUnit = document.getElementById('toUnit');
+            fromUnit.innerHTML = '';
+            toUnit.innerHTML = '';
+
+            units[category].forEach(unit => {
+                const option1 = document.createElement('option');
+                option1.value = unit.value;
+                option1.textContent = unit.name;
+                fromUnit.appendChild(option1);
+
+                const option2 = document.createElement('option');
+                option2.value = unit.value;
+                option2.textContent = unit.name;
+                toUnit.appendChild(option2);
+            });
+
+            convert(); // Trigger conversion after changing units
+        }
+
+        // Set category and toggle sections
+        let currentCategory = 'length';
+        function setCategory(category) {
+            currentCategory = category;
+            const converterSection = document.getElementById('converterSection');
+            const calculatorSection = document.getElementById('calculatorSection');
+
+            if (category === 'calculator') {
+                converterSection.style.display = 'none';
+                calculatorSection.style.display = 'flex';
+            } else {
+                converterSection.style.display = 'flex';
+                calculatorSection.style.display = 'none';
+                populateUnits(category);
+            }
+        }
+
+        populateUnits(currentCategory); // Initialize with length
+
+        // Conversion logic
+        function convert() {
+            const inputValue = parseFloat(document.getElementById('inputValue').value);
+            const fromUnit = document.getElementById('fromUnit').value;
+            const toUnit = document.getElementById('toUnit').value;
+
+            if (!isNaN(inputValue)) {
+                let result;
+                if (currentCategory === 'temperature') {
+                    result = convertTemperature(inputValue, fromUnit, toUnit);
+                } else {
+                    const valueInBase = inputValue / conversionRates[currentCategory][fromUnit];
+                    result = valueInBase * conversionRates[currentCategory][toUnit];
+                }
+                document.getElementById('outputValue').value = result.toFixed(6);
+            } else {
+                document.getElementById('outputValue').value = '';
+            }
+        }
+
+        // Simple Calculator Logic
+        let calcDisplay = document.getElementById('calcDisplay');
+        let currentExpression = '';
+
+        function appendToDisplay(value) {
+            currentExpression += value;
+            calcDisplay.value = currentExpression;
+        }
+
+        function clearDisplay() {
+            currentExpression = '';
+            calcDisplay.value = '';
+        }
+
+        function backspace() {
+            currentExpression = currentExpression.slice(0, -1);
+            calcDisplay.value = currentExpression;
+        }
+
+        function calculate() {
+            try {
+                const result = eval(currentExpression);
+                calcDisplay.value = result;
+                currentExpression = result.toString();
+            } catch (error) {
+                calcDisplay.value = 'Error';
+                currentExpression = '';
+            }
+        }
+    </script>
+</body>
+</html>
